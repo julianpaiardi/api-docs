@@ -1,5 +1,6 @@
-
 # Payment Provider App Development Guide
+
+> **Note:** The documents related to Payments API are updated very frequently. We recommend our partners implementing Payments API to subscribe to this repository and this pull request to receive be notified on updates. Mostly, we're making fixed and adding new information as we find out it's useful. We are commited to avoid any breaking changes.
 
 ### Glossary
 
@@ -12,7 +13,7 @@ It can be any of, but not limited to:
 - Debit Card
 - Bank Debit
 - Boleto _(Brasil only)_
-- Ticket _(Argentina only, e.g. _Pago Fácil_, _RapiPago_, etc)_
+- Ticket _(Argentina only, e.g. Pago Fácil, RapiPago, etc)_
 - Wire Transfer
 - Wallet _(i.e. customer's account credit)_
 - Cash
@@ -641,7 +642,7 @@ Some SDKs have mechanisms to render forms using field names as required. To prot
 
 The object `Checkout.data.form` provides access to all the form fields. The payment method implementation must map each of the provided fields to the Payment Provider specific ones. In cases where a form with specific attributes needs to be submitted, we recommend using workarounds such as dynamically creating a hidden HTML form and submitting it using JS.
 
-### Transaction Implementation
+## Step 4: Transaction Implementation
 
 So far, we've been working with orders. However, we don't provide any endpoints to directly change an order's payment status.
 
@@ -649,7 +650,7 @@ Meet the `Transaction`. An `Order` can have many `Transactions`. `Transactions` 
 
 An `Order` will automatically calculate its payment status by checking all of its related `Transactions` and applying business rules to calculate the current payment status.
 
-#### Creating a Transaction
+### Creating a Transaction
 The App’s backend must `POST` a `Transaction` to our platform as soon a one is created on the payment provider's side. Our `Transactions` resource is should reflect `Transactions` which exist and `TransactionEvents` which already happened.
 
 A `Transaction` not only helps calculate an `Order` payment status but also provides detailed information about the payment process so that the merchant can have full autonomy when dealing with payment issues. Also, this information is always important to help the merchant with feature business decisions.
@@ -664,22 +665,29 @@ With external payment option:
 
 ![Redirect Payment Option Sequence](./mmd/PaymentProvider-RedirectPaymentOption.mmd.png)
 
-#### Transaction Properties
+### Transaction Properties
 
 It’s very important to provide the merchant with as much information as possible for every `Transaction`. This is because buyers may contact merchants for different reasons, including any doubts about the status of their purchase or even for specific doubts about the payment they did.
 
 The [`TransactionInfo`](../../resources/transaction.md#transaction-info) object should be completed with all the information required for each payment method.
 
-#### Updating a Transaction
+### Updating a Transaction
 
 As explained before, Nuvemshop's Transaction API is designed to reflect transactions that already exist and events related to those transactions that have already happened. Our Transactions API will automatically calculate the `Transaction`'s `status` on every [`TransactionEvent`](../../resources/transaction.md#transaction-events) reported by the payment provider using the [`TransactionEvent` endpoint](../../resources/transaction.md#transaction-eventspost-ordersorder_idtransactionstransaction_idevents).
 
-#### Transaction event workflows
+### Transaction event workflows
 The possible `TransactionEvents` a `Transaction` can receive depend on the possible workflows for each payment method.
 
 The payment methods `boleto`, `ticket`, `bank_debit`, `debit card`, `wallet`, `wire_transfer` and `cash`, all share the same events workflow.
 
 The payment method credit_card has its own workflow to support all the `credit_card` specific transaction events.
+
+## Order Management: Refunds and Chargebacks
+Currently, customers can't cancel orders from their purchase tracking page. In case they want to cancel a purchase, they will need to contact the seller.
+
+Merchants can cancel orders from the store's dashboard but the money refund, if needed, must be done from the payment provider's dashboard. There is no way a merchant can execute a money transaction from their store's dashboard. Our `Order`'s `cancel` webhook _**must not**_ be used to execute any type of money transaction. However, if the payment provider executes a refund for a transaction which is related to a transaction at Nuvemshop, then a refund `TransactionEvent` must be posted to the corresponding Nuvemshop's transaction.
+
+Chargebacks, at the moment, are not modeled but we're looking forward to support them soon.
 
 ## Infrastructure
 It is important to take into account that Nuvemshop is a platform with 50K+ stores. This means the implemented backend will need to be able to handle high-traffic loads. All the necessary scaling, performance monitoring and alert triggering architecture must be implemented.
