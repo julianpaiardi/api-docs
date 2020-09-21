@@ -1,6 +1,6 @@
 # Payment Provider App Development Guide
 
-> **Note:** The documents related to Payments API are updated very frequently. We recommend our partners implementing Payments API to subscribe to this repository and this pull request to receive be notified on updates. Mostly, we're making fixed and adding new information as we find out it's useful. We are commited to avoid any breaking changes.
+> **Note:** The documents related to Payments API are updated very frequently. We recommend our partners implementing Payments API to subscribe to this repository and [this pull request](https://github.com/TiendaNube/api-docs/pull/75) to receive be notified on updates. Mostly, we're making fixed and adding new information as we find out it's useful. We are commited to avoid any breaking changes.
 
 ### Glossary
 
